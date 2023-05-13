@@ -28,7 +28,7 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #include <stdio.h>
 #include "constants.h"
 #include "lodepng.h"
-//#include "allmodels.h"
+#include "allmodels.h"
 #include "shaderprogram.h"
 #include "ImportModel.h"
 #include "steering.h"
@@ -78,8 +78,8 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	suzanne.loadObj("ModelFiles/suzanne.obj" , "./ModelFiles/");
-	suzanne.bindBuffers();
+	//suzanne.loadObj("ModelFiles/suzanne.obj" , "./ModelFiles/");
+	//suzanne.bindBuffers();
 
 }
 
@@ -90,6 +90,8 @@ void freeOpenGLProgram(GLFWwindow* window) {
     //************Tutaj umieszczaj kod, który należy wykonać po zakończeniu pętli głównej************
 	glDeleteTextures(1, &tex);
 }
+
+Models::Teapot teapot;
 
 //Procedura rysująca zawartość sceny
 void drawScene(GLFWwindow* window, glm::mat4 Camera) {
@@ -113,6 +115,7 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glUniformMatrix4fv(spLambertTextured->u("M"), 1, false, glm::value_ptr(M));
 
 
+	teapot.drawSolid();
 
 	glfwSwapBuffers(window);
 }
