@@ -30,15 +30,20 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #include "lodepng.h"
 #include "allmodels.h"
 #include "shaderprogram.h"
-#include "ImportModel.h"
 #include "steering.h"
+#include "obj_loader.hpp"
+#include "object.hpp"
+#include "read_texture.h"
 
 //globals
 float speed_y = 0.0f, speed_x = 0.0f, speed_z = 0.0f;
 float speed = 0; //Prędkość kątowa obrotu obiektu
+ShaderProgram* sp;
 
 //objects
-Model3D suzanne;
+auto suzanne_data = load_obj("suzanne.obj");
+object suzanne;
+
 
 //texture
 GLuint tex;
@@ -51,7 +56,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void error_callback(int error, const char* description) {
 	fputs(description, stderr);
 }
-
 
 
 //Procedura inicjująca
@@ -80,7 +84,9 @@ void initOpenGLProgram(GLFWwindow* window) {
 
 	//suzanne.loadObj("ModelFiles/suzanne.obj" , "./ModelFiles/");
 	//suzanne.bindBuffers();
-
+	sp = new ShaderProgram("v_simplest.glsl", NULL, "f_simplest.glsl");
+	suzanne = object(suzanne_data, { "metal.png", "metal_spec.png" }, sp);
+	tex = read_texture("metal.png");
 }
 
 
@@ -92,6 +98,8 @@ void freeOpenGLProgram(GLFWwindow* window) {
 }
 
 Models::Teapot teapot;
+
+
 
 //Procedura rysująca zawartość sceny
 void drawScene(GLFWwindow* window, glm::mat4 Camera) {
@@ -109,13 +117,17 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glm::mat4 P = glm::perspective(
 		glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
-	spLambertTextured->use();//Aktywacja programu cieniującego
-	glUniformMatrix4fv(spLambertTextured->u("P"), 1, false, glm::value_ptr(P)); //Załadowanie macierzy rzutowania do programu cieniującego
-	glUniformMatrix4fv(spLambertTextured->u("V"), 1, false, glm::value_ptr(V)); //Załadowanie macierzy widoku do programu cieniującego
-	glUniformMatrix4fv(spLambertTextured->u("M"), 1, false, glm::value_ptr(M));
+	sp->use();//Aktywacja programu cieniującego
+	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P)); //Załadowanie macierzy rzutowania do programu cieniującego
+	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V)); //Załadowanie macierzy widoku do programu cieniującego
+	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 
 
-	teapot.drawSolid();
+	suzanne.draw();
+
+
+	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
+	//teapot.drawSolid();
 
 	glfwSwapBuffers(window);
 }
@@ -159,15 +171,14 @@ int main(void)
 	//Główna pętla
 	while (!glfwWindowShouldClose(window)) //Tak długo jak okno nie powinno zostać zamknięte
 	{
-
-		cameraPos += objSpeed * glm::vec3(glfwGetTime());
-		glm::mat4 Camera = glm::lookAt(
+		cameraPos += objSpeed * (float)glfwGetTime();
+		glm::mat4 camera = glm::lookAt(
 			cameraPos, // im at
 			cameraFront + cameraPos, // look to point
 			cameraUp); // angle of top
 
 		glfwSetTime(0);
-		drawScene(window, Camera); //Wykonaj procedurę rysującą
+		drawScene(window, camera); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
 	}
 

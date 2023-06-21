@@ -21,11 +21,8 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #ifndef SHADERPROGRAM_H
 #define SHADERPROGRAM_H
 
-
 #include <GL/glew.h>
-#include "stdio.h"
-
-
+#include <cstdio>
 
 class ShaderProgram {
 private:
@@ -53,5 +50,7 @@ extern ShaderProgram* spLambertTextured;
 
 void initShaders();
 void freeShaders();
+
+using shader_program = ShaderProgram;
 
 #endif

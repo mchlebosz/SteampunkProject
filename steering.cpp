@@ -29,14 +29,12 @@ glm::vec3 speedShift = glm::vec3(0.0f, 0.0f, 0.0f);
 void key_callback(GLFWwindow* window, int key,
 	int scancode, int action, int mods) {
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		float scale = 1/abs(cameraFront.x + cameraFront.z);
-		speedW = cameraSpeed * cameraFront * glm::vec3(1.0f, 0.0f, 1.0f) * scale;
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		float scale = 1/abs(cameraFront.x + cameraFront.z);
-		speedS = -cameraSpeed * cameraFront * glm::vec3(1.0f, 0.0f, 1.0f) * scale;
-	}
+	float time = glfwGetTime() * 100;
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
+		speedW = cameraSpeed * cameraFront * glm::vec3(1.0f, 0.0f, 1.0f);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) 
+		speedS = -cameraSpeed * cameraFront * glm::vec3(1.0f, 0.0f, 1.0f);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		speedA = glm::normalize(glm::cross(cameraFront, cameraUp)) * -cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)

@@ -20,14 +20,14 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-const float PI = 3.141592653589793f;
+static constexpr float PI = 3.141592653589793f;
 
-const float BG_RED = 0.6F;
-const float BG_GREEN = 1.0f;
-const float BG_BLUE = 0.3f;
+static constexpr float BG_RED = 0.6F;
+static constexpr float BG_GREEN = 1.0f;
+static constexpr float BG_BLUE = 0.3f;
 
-const int SCR_WIDTH = 1920;
-const int SCR_HEIGHT = 1080;
-const float SCREEN_RATIO = float(SCR_WIDTH) / float(SCR_HEIGHT);
+static constexpr int SCR_WIDTH = 1280;
+static constexpr int SCR_HEIGHT = 720;
+static constexpr float SCREEN_RATIO = (float)SCR_WIDTH / (float)SCR_HEIGHT;
 
 #endif
