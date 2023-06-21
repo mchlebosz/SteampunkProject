@@ -114,11 +114,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="3DModels\cube.obj">
+    <Object Include="ModelFiles\suzanne.obj">
       <Filter>ModelFiles</Filter>
-    </Resource>
-    <Resource Include="3DModels\suzanne.obj">
+    </Object>
+    <Object Include="ModelFiles\cube.obj">
       <Filter>ModelFiles</Filter>
-    </Resource>
+    </Object>
   </ItemGroup>
 </Project>

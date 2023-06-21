@@ -55,14 +55,8 @@
     <None Include="v_simplest.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="3DModels\cube.obj">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </Resource>
-    <Resource Include="3DModels\suzanne.obj">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </Resource>
+    <Object Include="ModelFiles\cube.obj" />
+    <Object Include="ModelFiles\suzanne.obj" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
