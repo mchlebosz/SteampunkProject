@@ -41,7 +41,7 @@ float speed = 0; //Prędkość kątowa obrotu obiektu
 ShaderProgram* sp;
 
 //objects
-auto suzanne_data = load_obj("suzanne.obj");
+auto suzanne_data = load_obj("ModelFiles/suzanne.obj");
 object suzanne;
 
 
@@ -127,9 +127,6 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
-	//teapot.drawSolid();
-
-	glfwSwapBuffers(window);
 }
 
 
