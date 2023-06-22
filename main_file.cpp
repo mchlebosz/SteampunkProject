@@ -39,14 +39,47 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 float speed_y = 0.0f, speed_x = 0.0f, speed_z = 0.0f;
 float speed = 0; //Prędkość kątowa obrotu obiektu
 ShaderProgram* sp;
+float aspectRatio = 1;
 
 //objects
 auto suzanne_data = load_obj("ModelFiles/suzanne.obj");
+auto house_data = load_obj("ModelFiles/HOUSE_LGH_TIR_1.obj");
 object suzanne;
+object house;
 
 
 //texture
 GLuint tex;
+
+//Color Textures
+GLuint color_tex_house_metal;
+GLuint color_tex_house_wood;
+GLuint color_tex_house_roof;
+GLuint color_tex_house_white_metal;
+GLuint color_tex_house_glass;
+
+//Normals Textures
+GLuint normal_tex_house_metal;
+GLuint normal_tex_house_wood;
+GLuint normal_tex_house_roof;
+GLuint normal_tex_house_white_metal;
+GLuint normal_tex_house_glass;
+
+//Metallic Textures
+GLuint metallic_tex_house_metal;
+GLuint metallic_tex_house_wood;
+GLuint metallic_tex_house_roof;
+GLuint metallic_tex_house_white_metal;
+GLuint metallic_tex_house_glass;
+
+
+//Roughness Textures
+GLuint roughness_tex_house_metal;
+GLuint roughness_tex_house_wood;
+GLuint roughness_tex_house_roof;
+GLuint roughness_tex_house_white_metal;
+GLuint roughness_tex_house_glass;
+
 
 //auto resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -55,6 +88,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 //Procedura obsługi błędów
 void error_callback(int error, const char* description) {
 	fputs(description, stderr);
+}
+
+void windowResizeCallback(GLFWwindow* window, int width, int height) {
+	if (height == 0) return;
+	aspectRatio = (float)width / (float)height;
+	glViewport(0, 0, width, height);
 }
 
 
@@ -69,6 +108,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetWindowSizeCallback(window, windowResizeCallback);
 
 	float maxAnisotropy;
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
@@ -82,11 +122,43 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+
+	/*
+	//read all textures
+	//diffuse
+	color_tex_house_metal = read_texture("ModelFiles/HOUSE_Texture/Metal/metal_basecolor.png");
+	color_tex_house_wood = read_texture("ModelFiles/HOUSE_Texture/wood/Substance_graph_diffuse.png");
+	color_tex_house_roof = read_texture("ModelFiles/HOUSE_Texture/roof/Roof_basecolor_red.png");
+	color_tex_house_white_metal = read_texture("ModelFiles/HOUSE_Texture/white metal/white_meetal_basecolor.png");
+	color_tex_house_glass = read_texture("ModelFiles/HOUSE_Texture/glass_faceced/glass_faceted_basecolor_blue.png");
+	//normal
+	normal_tex_house_metal = read_texture("ModelFiles/HOUSE_Texture/Metal/metal_normal.png");
+	normal_tex_house_wood = read_texture("ModelFiles/HOUSE_Texture/wood/Substance_graph_normal.png");
+	normal_tex_house_roof = read_texture("ModelFiles/HOUSE_Texture/roof/Roof_normal.png");
+	normal_tex_house_white_metal = read_texture("ModelFiles/HOUSE_Texture/white metal/white_meetal_normal.png");
+	normal_tex_house_glass = read_texture("ModelFiles/HOUSE_Texture/glass_faceced/glass_faceted_normal.png");
+	//metallic
+	metallic_tex_house_metal = read_texture("ModelFiles/HOUSE_Texture/Metal/metal_metallic.png");
+	metallic_tex_house_wood = read_texture("ModelFiles/HOUSE_Texture/wood/Substance_graph_metallic.png");
+	metallic_tex_house_roof = read_texture("ModelFiles/HOUSE_Texture/roof/Roof_metallic.png");
+	metallic_tex_house_white_metal = read_texture("ModelFiles/HOUSE_Texture/white metal/white_meetal_metallic.png");
+	metallic_tex_house_glass = read_texture("ModelFiles/HOUSE_Texture/glass_faceced/glass_faceted_metallic.png");
+	//roughness
+	roughness_tex_house_metal = read_texture("ModelFiles/HOUSE_Texture/Metal/metal_roughness.png");
+	roughness_tex_house_wood = read_texture("ModelFiles/HOUSE_Texture/wood/Substance_graph_roughness.png");
+	roughness_tex_house_roof = read_texture("ModelFiles/HOUSE_Texture/roof/Roof_roughness.png");
+	roughness_tex_house_white_metal = read_texture("ModelFiles/HOUSE_Texture/white metal/white_meetal_roughness.png");
+	roughness_tex_house_glass = read_texture("ModelFiles/HOUSE_Texture/glass_faceced/glass_faceted_roughness.png");
+	*/
+
+
 	//suzanne.loadObj("ModelFiles/suzanne.obj" , "./ModelFiles/");
 	//suzanne.bindBuffers();
 	sp = new ShaderProgram("v_simplest.glsl", NULL, "f_simplest.glsl");
 	suzanne = object(suzanne_data, { "metal.png", "metal_spec.png" }, sp);
-	tex = read_texture("metal.png");
+	//tex = read_texture("metal.png");
+
+	house = object(house_data, { "ModelFiles/HOUSE_Texture/Metal/metal_basecolor.png", "ModelFiles/HOUSE_Texture/Metal/metal_metallic.png", "ModelFiles/HOUSE_Texture/Metal/metal_roughness.png", "ModelFiles/HOUSE_Texture/Metal/metal_normal.png" }, sp);
 }
 
 
@@ -95,6 +167,34 @@ void freeOpenGLProgram(GLFWwindow* window) {
     freeShaders();
     //************Tutaj umieszczaj kod, który należy wykonać po zakończeniu pętli głównej************
 	glDeleteTextures(1, &tex);
+
+	/*
+	//delete all textures
+	//diffuse
+	glDeleteTextures(1, &color_tex_house_metal);
+	glDeleteTextures(1, &color_tex_house_wood);
+	glDeleteTextures(1, &color_tex_house_roof);
+	glDeleteTextures(1, &color_tex_house_white_metal);
+	glDeleteTextures(1, &color_tex_house_glass);
+	//normal
+	glDeleteTextures(1, &normal_tex_house_metal);
+	glDeleteTextures(1, &normal_tex_house_wood);
+	glDeleteTextures(1, &normal_tex_house_roof);
+	glDeleteTextures(1, &normal_tex_house_white_metal);
+	glDeleteTextures(1, &normal_tex_house_glass);
+	//metallic
+	glDeleteTextures(1, &metallic_tex_house_metal);
+	glDeleteTextures(1, &metallic_tex_house_wood);
+	glDeleteTextures(1, &metallic_tex_house_roof);
+	glDeleteTextures(1, &metallic_tex_house_white_metal);
+	glDeleteTextures(1, &metallic_tex_house_glass);
+	//roughness
+	glDeleteTextures(1, &roughness_tex_house_metal);
+	glDeleteTextures(1, &roughness_tex_house_wood);
+	glDeleteTextures(1, &roughness_tex_house_roof);
+	glDeleteTextures(1, &roughness_tex_house_white_metal);
+	glDeleteTextures(1, &roughness_tex_house_glass);
+	*/
 }
 
 Models::Teapot teapot;
@@ -123,7 +223,8 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 
 
-	suzanne.draw();
+	//suzanne.draw();
+	house.draw();
 
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
