@@ -113,12 +113,4 @@
       <Filter>Pliki zasobów</Filter>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="ModelFiles\suzanne.obj">
-      <Filter>ModelFiles</Filter>
-    </Object>
-    <Object Include="ModelFiles\cube.obj">
-      <Filter>ModelFiles</Filter>
-    </Object>
-  </ItemGroup>
 </Project>

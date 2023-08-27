@@ -83,6 +83,10 @@ public:
 		glDisableVertexAttribArray(sp->a("texCoord0"));  //Wy³¹cz przesy³anie danych do atrybutu texCoord0
 	}
 
+	const auto& textures() const {
+		return m_textures;
+	}
+
 private:
 	inline void _load_textures(const std::vector<std::string_view>& textures) {
 		for (const auto& tex : textures) {
