@@ -193,9 +193,6 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glDisableVertexAttribArray(sp->a("texCoord0"));  //Wyłącz przesyłanie danych do atrybutu texCoord0
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
-	//teapot.drawSolid();
-
-	glfwSwapBuffers(window);
 }
 
 
