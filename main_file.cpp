@@ -38,8 +38,27 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
-constexpr const char* obj_path = "ModelFiles/domek.obj";
-constexpr const char* tex_path = "ModelFiles/House_base_color.png";
+//constexpr const char* obj_path = "ModelFiles/domek.obj";
+//constexpr const char* tex_path = "ModelFiles/House_base_color.png"; //Diffuse - color of the object
+//constexpr const char* normal_path = "ModelFiles/House_bump.png"; // Normal - bumps
+//constexpr const char* height_path =  "ModelFiles/Med/Med_6-2_Height.jpg"; // Height - elevation
+//constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
+//constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
+
+//constexpr const char* obj_path = "ModelFiles/Med/Med_6-2.obj";
+//constexpr const char* tex_path = "ModelFiles/Med/Med_6-2_BaseColor.jpg"; //Diffuse - color of the object
+//constexpr const char* normal_path = "ModelFiles/Med/Med_6-2_Normal.jpg"; // Normal - bumps
+//constexpr const char* height_path =  "ModelFiles/Med/Med_6-2_Height.jpg"; // Height - elevation
+//constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
+//constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
+
+constexpr const char* obj_path = "ModelFiles/Warehouse/Destroyed_warehouse_in_Kaarina_Finland_SF.obj";
+constexpr const char* tex_path = "ModelFiles/Warehouse/Destroyed_warehouse_in_Kaarina_finland.jpg"; //Diffuse - color of the object
+constexpr const char* normal_path = "ModelFiles/Warehouse/Destroyed_warehouse_in_Kaarina_finland_normal.jpg"; // Normal - bumps
+//constexpr const char* height_path =  "ModelFiles/Med/Med_6-2_Height.jpg"; // Height - elevation
+// 
+//constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
+//constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
 
 Assimp::Importer importer;
 
@@ -52,6 +71,7 @@ std::vector<float> texCoordsv;
 //globals
 float speed_y = 0.0f, speed_x = 0.0f, speed_z = 0.0f;
 float speed = 0; //Prędkość kątowa obrotu obiektu
+float aspectRatio = 16.0f / 9.0f; //Stosunek wymiarów widoku
 ShaderProgram* sp;
 
 //objects
@@ -62,13 +82,17 @@ object suzanne;
 GLuint tex;
 
 //auto resize
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
+void windowResizeCallback(GLFWwindow* window, int width, int height) {
+	if (height == 0) return;
+	aspectRatio = (float)width / (float)height;
+	glViewport(0, 0, width, height);
+}
 
 //Procedura obsługi błędów
 void error_callback(int error, const char* description) {
 	fputs(description, stderr);
 }
+
 
 
 //Procedura inicjująca
@@ -82,6 +106,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetWindowSizeCallback(window, windowResizeCallback);
 
 	float maxAnisotropy;
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
@@ -99,12 +124,17 @@ void initOpenGLProgram(GLFWwindow* window) {
 	//suzanne.bindBuffers();
 	sp = new ShaderProgram("v_simplest.glsl", NULL, "f_simplest.glsl");
 	tex = read_texture(tex_path);
-	suzanne = object(suzanne_data, { tex_path, "ModelFiles\\House_ROUGHNESS.png" }, sp);
+
+	suzanne = object(suzanne_data, { tex_path, normal_path }, sp);
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
+		// Vertices
+		verticesv.push_back(mesh->mVertices[i].x);
 		verticesv.push_back(mesh->mVertices[i].y);
-		verticesv.push_back(mesh->mVertices[i].z);;
+		verticesv.push_back(mesh->mVertices[i].z);
 		verticesv.push_back(1.0f);
+
+
 
 		normalsv.push_back(mesh->mNormals[i].x);
 		normalsv.push_back(mesh->mNormals[i].y);
@@ -132,10 +162,8 @@ void freeOpenGLProgram(GLFWwindow* window) {
     freeShaders();
     //************Tutaj umieszczaj kod, który należy wykonać po zakończeniu pętli głównej************
 	glDeleteTextures(1, &tex);
+	delete sp;
 }
-
-Models::Teapot teapot;
-
 
 
 //Procedura rysująca zawartość sceny
@@ -165,7 +193,7 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	float* normals = normalsv.data();
 	float* texCoords = texCoordsv.data();
 
-	//suzanne.draw();
+
 	glEnableVertexAttribArray(sp->a("vertex"));  //Włącz przesyłanie danych do atrybutu vertex
 	glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, vertices); //Wskaż tablicę z danymi dla atrybutu vertex
 
@@ -175,8 +203,8 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glEnableVertexAttribArray(sp->a("normal"));  //Włącz przesyłanie danych do atrybutu normal
 	glVertexAttribPointer(sp->a("normal"), 4, GL_FLOAT, false, 0, normals); //Wskaż tablicę z danymi dla atrybutu normal
 
-	glEnableVertexAttribArray(sp->a("texCoord0"));  //Włącz przesyłanie danych do atrybutu texCoord0
-	glVertexAttribPointer(sp->a("texCoord0"), 2, GL_FLOAT, false, 0, texCoords); //Wskaż tablicę z danymi dla atrybutu texCoord0
+	glEnableVertexAttribArray(sp->a("texCoord0"));  //Włącz przesyłanie danych do atrybutu texCoord
+	glVertexAttribPointer(sp->a("texCoord0"), 2, GL_FLOAT, false, 0, texCoords); //Wskaż tablicę z danymi dla atrybutu texCoord
 
 	for (size_t i = 0; i < suzanne.textures().size(); ++i) {
 		std::string texName = "textureMap" + std::to_string(i);
