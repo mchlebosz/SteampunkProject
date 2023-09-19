@@ -35,7 +35,7 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
-
+#include "object.h"
 //constexpr const char* obj_path = "ModelFiles/domek.obj";
 //constexpr const char* tex_path = "ModelFiles/House_base_color.png"; //Diffuse - color of the object
 //constexpr const char* normal_path = "ModelFiles/House_bump.png"; // Normal - bumps
@@ -61,17 +61,8 @@ constexpr const char* skybox_tex_path = "ModelFiles/skybox.png"; //Diffuse - col
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
 //constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
 
-Assimp::Importer importer;
-
-const aiScene* scene = importer.ReadFile(obj_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
-auto mesh = scene->mMeshes[0];
-std::vector<float> verticesv;
-std::vector<float> normalsv;
-std::vector<float> colorsv;
-std::vector<float> texCoordsv;
-GLuint tex0;
-GLuint tex1;
-GLuint tex2;
+object warehouse;
+object skybox;
 
 //globals
 float speed_y = 0.0f, speed_x = 0.0f, speed_z = 0.0f;
@@ -119,38 +110,9 @@ void initOpenGLProgram(GLFWwindow* window) {
 	//suzanne.loadObj("ModelFiles/suzanne.obj" , "./ModelFiles/");
 	//suzanne.bindBuffers();
 	sp = new ShaderProgram("v_simplest.glsl", NULL, "f_simplest.glsl");
-	tex0 = read_texture(tex_path);
-	//tex1 = read_texture(tex_path);
-	tex1 = read_texture(normal_path);
-	tex2 = read_texture(occlusion_path);
 
-	//suzanne = object(suzanne_data, { tex_path, normal_path }, sp);
-
-	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-		// Vertices
-		verticesv.push_back(mesh->mVertices[i].x);
-		verticesv.push_back(mesh->mVertices[i].y);
-		verticesv.push_back(mesh->mVertices[i].z);
-		verticesv.push_back(1.0f);
-
-		normalsv.push_back(mesh->mNormals[i].x);
-		normalsv.push_back(mesh->mNormals[i].y);
-		normalsv.push_back(mesh->mNormals[i].z);
-		normalsv.push_back(0.0f);
-		
-		// Colors (Assuming you have per-vertex colors)
-		if (mesh->HasVertexColors(0)) {
-			colorsv.push_back(mesh->mColors[0][i].r);
-			colorsv.push_back(mesh->mColors[0][i].g);
-			colorsv.push_back(mesh->mColors[0][i].b);
-			colorsv.push_back(1.0f);
-		}
-
-		if (mesh->HasTextureCoords(0)) {
-			texCoordsv.push_back(mesh->mTextureCoords[0][i].x);
-			texCoordsv.push_back(mesh->mTextureCoords[0][i].y);
-		}
-	}
+	warehouse = object(obj_path, { tex_path, normal_path, occlusion_path }, sp);
+	skybox = object(skybox_obj_path, { skybox_tex_path }, sp);
 }
 
 
@@ -158,9 +120,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 void freeOpenGLProgram(GLFWwindow* window) {
     freeShaders();
     //************Tutaj umieszczaj kod, który należy wykonać po zakończeniu pętli głównej************
-	glDeleteTextures(1, &tex0);
-	glDeleteTextures(1, &tex1);
-	glDeleteTextures(1, &tex2);
+
 	delete sp;
 }
 
@@ -181,48 +141,18 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glm::mat4 P = glm::perspective(
 		glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
+	static constexpr float scale = 50.f;
+	glm::mat4 skybox_M = glm::scale(M, glm::vec3(scale, scale, scale));
+	
 	sp->use();//Aktywacja programu cieniującego
 	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P)); //Załadowanie macierzy rzutowania do programu cieniującego
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V)); //Załadowanie macierzy widoku do programu cieniującego
+	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(skybox_M));
+
+	skybox.draw();
+
 	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
-
-	auto mesh = scene->mMeshes[0];
-	float* vertices = verticesv.data();
-	float* colors = colorsv.data();
-	float* normals = normalsv.data();
-	float* texCoords = texCoordsv.data();
-
-
-	glEnableVertexAttribArray(sp->a("vertex"));  //Włącz przesyłanie danych do atrybutu vertex
-	glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, vertices); //Wskaż tablicę z danymi dla atrybutu vertex
-
-	glEnableVertexAttribArray(sp->a("color"));  //Włącz przesyłanie danych do atrybutu color
-	glVertexAttribPointer(sp->a("color"), 4, GL_FLOAT, false, 0, colors); //Wskaż tablicę z danymi dla atrybutu color
-
-	glEnableVertexAttribArray(sp->a("normal"));  //Włącz przesyłanie danych do atrybutu normal
-	glVertexAttribPointer(sp->a("normal"), 4, GL_FLOAT, false, 0, normals); //Wskaż tablicę z danymi dla atrybutu normal
-
-	glEnableVertexAttribArray(sp->a("texCoord0"));  //Włącz przesyłanie danych do atrybutu texCoord
-	glVertexAttribPointer(sp->a("texCoord0"), 2, GL_FLOAT, false, 0, texCoords); //Wskaż tablicę z danymi dla atrybutu texCoord
-
-	glUniform1i(sp->u("textureMap0"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex0);
-
-	glUniform1i(sp->u("textureMap1"), 1);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, tex1);
-
-	glUniform1i(sp->u("textureMap2"), 2);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, tex2);
-
-	glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices); //Narysuj obiekt
-
-	glDisableVertexAttribArray(sp->a("vertex"));  //Wyłącz przesyłanie danych do atrybutu vertex
-	glDisableVertexAttribArray(sp->a("color"));  //Wyłącz przesyłanie danych do atrybutu color
-	glDisableVertexAttribArray(sp->a("normal"));  //Wyłącz przesyłanie danych do atrybutu normal
-	glDisableVertexAttribArray(sp->a("texCoord0"));  //Wyłącz przesyłanie danych do atrybutu texCoord0
+	warehouse.draw();
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }

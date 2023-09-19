@@ -24,7 +24,7 @@
     <ClInclude Include="cube.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="model.h" />
-    <ClInclude Include="obj_loader.hpp" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="read_texture.h" />
     <ClInclude Include="shaderprogram.h" />
     <ClInclude Include="sphere.h" />
