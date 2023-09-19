@@ -32,9 +32,6 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #include "shaderprogram.h"
 #include "steering.h"
 #include "read_texture.h"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
 #include "object.h"
 //constexpr const char* obj_path = "ModelFiles/domek.obj";
 //constexpr const char* tex_path = "ModelFiles/House_base_color.png"; //Diffuse - color of the object
@@ -69,6 +66,7 @@ float speed_y = 0.0f, speed_x = 0.0f, speed_z = 0.0f;
 float speed = 0; //Prędkość kątowa obrotu obiektu
 float aspectRatio = 16.0f / 9.0f; //Stosunek wymiarów widoku
 ShaderProgram* sp;
+ShaderProgram* skybox_shader;
 
 //auto resize
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
@@ -110,9 +108,11 @@ void initOpenGLProgram(GLFWwindow* window) {
 	//suzanne.loadObj("ModelFiles/suzanne.obj" , "./ModelFiles/");
 	//suzanne.bindBuffers();
 	sp = new ShaderProgram("v_simplest.glsl", NULL, "f_simplest.glsl");
+	skybox_shader = spTextured;
+
 
 	warehouse = object(obj_path, { tex_path, normal_path, occlusion_path }, sp);
-	skybox = object(skybox_obj_path, { skybox_tex_path }, sp);
+	skybox = object(skybox_obj_path, { skybox_tex_path }, skybox_shader);
 }
 
 
@@ -130,30 +130,31 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	//************Tutaj umieszczaj kod rysujący obraz******************l
 	glClearColor(BG_RED, BG_GREEN, BG_BLUE, 1); //Kolor czyszczący (wypełnienia okna) ustawiono na niebieski
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wyczyszczenie bufora kolorów i bufora głębokości
+	static constexpr float scale = 100.f;
 
 	// Model
-	glm::mat4 M = glm::mat4(1.0f);
-	M = glm::translate(M, glm::vec3(0.0f, -8.0f, 0.0f));
-	M = glm::scale(M, glm::vec3(2.0f));
+	glm::mat4 M = glm::mat4(1.0f); //Macierz modelu
+	glm::mat4 skybox_M = glm::translate(M, glm::vec3(0.f, scale, 0.f));
+	skybox_M = glm::scale(skybox_M, glm::vec3(scale, scale, scale));
 	//M = glm::rotate(M, glm::radians(time_change), glm::vec3(0.0f, 1.0f, 0.0f));
 	// Widok
 	glm::mat4 V = Camera;
 
+	
 	// Perspektywa
 	glm::mat4 P = glm::perspective(
-		glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 400.0f);
-
-	static constexpr float scale = 80.f;
-	glm::mat4 skybox_M = glm::scale(M, glm::vec3(scale));
+		glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 2.f * scale * std::pow(scale, 1.f / 3.f) + 1);
+	
+	skybox_shader->use();
+	glUniformMatrix4fv(skybox_shader->u("P"), 1, false, glm::value_ptr(P)); //Załadowanie macierzy rzutowania do programu cieniującego
+	glUniformMatrix4fv(skybox_shader->u("V"), 1, false, glm::value_ptr(V)); //Załadowanie macierzy widoku do programu cieniującego
+	glUniformMatrix4fv(skybox_shader->u("M"), 1, false, glm::value_ptr(skybox_M));
+	skybox.draw();
 	
 	sp->use();//Aktywacja programu cieniującego
+	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P)); //Załadowanie macierzy rzutowania do programu cieniującego
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V)); //Załadowanie macierzy widoku do programu cieniującego
-	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(skybox_M));
-
-	skybox.draw();
-
-	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 	warehouse.draw();
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
