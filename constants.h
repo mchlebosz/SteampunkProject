@@ -22,9 +22,9 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 
 static constexpr float PI = 3.141592653589793f;
 
-static constexpr float BG_RED = 0.6F;
-static constexpr float BG_GREEN = 1.0f;
-static constexpr float BG_BLUE = 0.3f;
+static constexpr float BG_RED = 0.2F;
+static constexpr float BG_GREEN = 0.5f;
+static constexpr float BG_BLUE = 0.99f;
 
 static constexpr int SCR_WIDTH = 1280;
 static constexpr int SCR_HEIGHT = 720;

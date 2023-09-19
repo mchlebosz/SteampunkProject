@@ -52,7 +52,7 @@ constexpr const char* tex_path = "ModelFiles/Warehouse/texture.png"; //Diffuse -
 constexpr const char* normal_path = "ModelFiles/Warehouse/normal.png"; // Normal - bumps
 constexpr const char* occlusion_path =  "ModelFiles/Warehouse/occlusion.png"; // Occlusion - shadows
 
-constexpr const char* skybox_obj_path = "ModelFiles/skybox.obj";
+constexpr const char* skybox_obj_path = "ModelFiles/skybox2.obj";
 constexpr const char* skybox_tex_path = "ModelFiles/skybox2.png"; //Diffuse - color of the object
 // 
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
