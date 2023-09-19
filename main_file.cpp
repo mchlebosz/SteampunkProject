@@ -53,7 +53,7 @@ constexpr const char* normal_path = "ModelFiles/Warehouse/normal.png"; // Normal
 constexpr const char* occlusion_path =  "ModelFiles/Warehouse/occlusion.png"; // Occlusion - shadows
 
 constexpr const char* skybox_obj_path = "ModelFiles/skybox.obj";
-constexpr const char* skybox_tex_path = "ModelFiles/skybox.png"; //Diffuse - color of the object
+constexpr const char* skybox_tex_path = "ModelFiles/skybox2.png"; //Diffuse - color of the object
 // 
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
 //constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
@@ -134,9 +134,13 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 
 	// Model
 	glm::mat4 M = glm::mat4(1.0f); //Macierz modelu
-	glm::mat4 skybox_M = glm::translate(M, glm::vec3(0.f, scale, 0.f));
-	skybox_M = glm::scale(skybox_M, glm::vec3(scale, scale, scale));
-	//M = glm::rotate(M, glm::radians(time_change), glm::vec3(0.0f, 1.0f, 0.0f));
+	M = glm::translate(M, glm::vec3(4.0f, -8.0f, 15.f));
+	M = glm::scale(M, glm::vec3(2.4f));
+
+	glm::mat4 skybox_M = glm::translate(M, glm::vec3(0.f, 0.0f, 0.f));
+	skybox_M = glm::rotate(skybox_M, glm::radians(90.f), glm::vec3(0.0f, 0.0f, -1.0f));
+	skybox_M = glm::scale(skybox_M, glm::vec3(scale));
+	//skybox_M = glm::rotate(skybox_M, glm::radians(time_change), glm::vec3(0.0f, 1.0f, 0.0f));
 	// Widok
 	glm::mat4 V = Camera;
 
@@ -155,6 +159,11 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P)); //Załadowanie macierzy rzutowania do programu cieniującego
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V)); //Załadowanie macierzy widoku do programu cieniującego
+	warehouse.draw();
+
+	M = glm::rotate(M, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
+	M = glm::translate(M, glm::vec3(0.0f, 0.0f, -20.f));
+	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 	warehouse.draw();
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
