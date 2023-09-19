@@ -35,13 +35,13 @@ void main(void) {
 
     // Retrieve the diffuse and specular colors from textureMap0
     vec4 kd = texture(textureMap0, iTexCoord0);
-    vec4 ks = vec4(0.5,0.5,0.4,0.1); // Assuming a white specular color for simplicity
+    vec4 ks = vec4(0.1,0.1,0.1,0.2); // Assuming a white specular color for simplicity
 
     // Retrieve ambient occlusion value from textureMap2
     float ao = texture(textureMap2, iTexCoord0).r;
 
     // Calculate the final pixel color
-    vec3 ambientColor = vec3(0.1, 0.1, 0.1); // Ambient lighting
+    vec3 ambientColor = vec3(0.2, 0.2, 0.1); // Ambient lighting
 
     // Apply ambient occlusion to the ambient color
     vec3 ambientWithAO = ambientColor * (1.0 - ao);

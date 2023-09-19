@@ -23,7 +23,7 @@ out vec2 iTexCoord0;
 void main(void) {
     //mat4 invTBN = mat4(c1, c2, c3, vec4(0, 0, 0, 1));
 
-    vec4 lp = vec4(-20, 20, 0, 1); //przestrzeń świata
+    vec4 lp = vec4(-50, 30, 30, 1); //przestrzeń świata
 
     lightDir = normalize(V * lp - V*M*vertex); //wektor do światła w przestrzeni oka
     viewDir = normalize(vec4(0, 0, 0, 1) - V * M * vertex); //wektor do obserwatora w przestrzeni oka

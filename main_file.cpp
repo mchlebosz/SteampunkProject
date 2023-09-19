@@ -133,16 +133,18 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 
 	// Model
 	glm::mat4 M = glm::mat4(1.0f);
+	M = glm::translate(M, glm::vec3(0.0f, -8.0f, 0.0f));
+	M = glm::scale(M, glm::vec3(2.0f));
 	//M = glm::rotate(M, glm::radians(time_change), glm::vec3(0.0f, 1.0f, 0.0f));
 	// Widok
 	glm::mat4 V = Camera;
 
 	// Perspektywa
 	glm::mat4 P = glm::perspective(
-		glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 400.0f);
 
-	static constexpr float scale = 50.f;
-	glm::mat4 skybox_M = glm::scale(M, glm::vec3(scale, scale, scale));
+	static constexpr float scale = 80.f;
+	glm::mat4 skybox_M = glm::scale(M, glm::vec3(scale));
 	
 	sp->use();//Aktywacja programu cieniującego
 	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P)); //Załadowanie macierzy rzutowania do programu cieniującego
