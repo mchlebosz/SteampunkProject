@@ -45,12 +45,6 @@
     <ClInclude Include="steering.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="object.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="object_data.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="obj_loader.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>

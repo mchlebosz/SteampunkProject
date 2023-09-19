@@ -31,8 +31,6 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #include "allmodels.h"
 #include "shaderprogram.h"
 #include "steering.h"
-#include "obj_loader.hpp"
-#include "object.hpp"
 #include "read_texture.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
@@ -52,9 +50,9 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
 //constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
 
-constexpr const char* obj_path = "ModelFiles/Warehouse/Destroyed_warehouse_in_Kaarina_Finland_SF.obj";
-constexpr const char* tex_path = "ModelFiles/Warehouse/Destroyed_warehouse_in_Kaarina_finland.jpg"; //Diffuse - color of the object
-constexpr const char* normal_path = "ModelFiles/Warehouse/Destroyed_warehouse_in_Kaarina_finland_normal.jpg"; // Normal - bumps
+constexpr const char* obj_path = "ModelFiles/Warehouse/object.obj";
+constexpr const char* tex_path = "ModelFiles/Warehouse/texture.png"; //Diffuse - color of the object
+constexpr const char* normal_path = "ModelFiles/Warehouse/normal.png"; // Normal - bumps
 //constexpr const char* height_path =  "ModelFiles/Med/Med_6-2_Height.jpg"; // Height - elevation
 // 
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
@@ -68,18 +66,14 @@ std::vector<float> verticesv;
 std::vector<float> normalsv;
 std::vector<float> colorsv;
 std::vector<float> texCoordsv;
+GLuint tex0;
+GLuint tex1;
+
 //globals
 float speed_y = 0.0f, speed_x = 0.0f, speed_z = 0.0f;
 float speed = 0; //Prędkość kątowa obrotu obiektu
 float aspectRatio = 16.0f / 9.0f; //Stosunek wymiarów widoku
 ShaderProgram* sp;
-
-//objects
-auto suzanne_data = load_obj(obj_path);
-object suzanne;
-
-//texture
-GLuint tex;
 
 //auto resize
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
@@ -92,8 +86,6 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 void error_callback(int error, const char* description) {
 	fputs(description, stderr);
 }
-
-
 
 //Procedura inicjująca
 void initOpenGLProgram(GLFWwindow* window) {
@@ -123,9 +115,11 @@ void initOpenGLProgram(GLFWwindow* window) {
 	//suzanne.loadObj("ModelFiles/suzanne.obj" , "./ModelFiles/");
 	//suzanne.bindBuffers();
 	sp = new ShaderProgram("v_simplest.glsl", NULL, "f_simplest.glsl");
-	tex = read_texture(tex_path);
+	tex0 = read_texture(tex_path);
+	//tex1 = read_texture(tex_path);
+	tex1 = read_texture(normal_path);
 
-	suzanne = object(suzanne_data, { tex_path, normal_path }, sp);
+	//suzanne = object(suzanne_data, { tex_path, normal_path }, sp);
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 		// Vertices
@@ -133,8 +127,6 @@ void initOpenGLProgram(GLFWwindow* window) {
 		verticesv.push_back(mesh->mVertices[i].y);
 		verticesv.push_back(mesh->mVertices[i].z);
 		verticesv.push_back(1.0f);
-
-
 
 		normalsv.push_back(mesh->mNormals[i].x);
 		normalsv.push_back(mesh->mNormals[i].y);
@@ -161,7 +153,8 @@ void initOpenGLProgram(GLFWwindow* window) {
 void freeOpenGLProgram(GLFWwindow* window) {
     freeShaders();
     //************Tutaj umieszczaj kod, który należy wykonać po zakończeniu pętli głównej************
-	glDeleteTextures(1, &tex);
+	glDeleteTextures(1, &tex0);
+	glDeleteTextures(1, &tex1);
 	delete sp;
 }
 
@@ -206,12 +199,13 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glEnableVertexAttribArray(sp->a("texCoord0"));  //Włącz przesyłanie danych do atrybutu texCoord
 	glVertexAttribPointer(sp->a("texCoord0"), 2, GL_FLOAT, false, 0, texCoords); //Wskaż tablicę z danymi dla atrybutu texCoord
 
-	for (size_t i = 0; i < suzanne.textures().size(); ++i) {
-		std::string texName = "textureMap" + std::to_string(i);
-		glUniform1i(sp->u(texName.c_str()), i);
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, suzanne.textures()[i]);
-	}
+	glUniform1i(sp->u("textureMap0"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex0);
+
+	glUniform1i(sp->u("textureMap1"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, tex1);
 
 	glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices); //Narysuj obiekt
 
