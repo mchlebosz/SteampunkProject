@@ -53,7 +53,7 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 constexpr const char* obj_path = "ModelFiles/Warehouse/object.obj";
 constexpr const char* tex_path = "ModelFiles/Warehouse/texture.png"; //Diffuse - color of the object
 constexpr const char* normal_path = "ModelFiles/Warehouse/normal.png"; // Normal - bumps
-//constexpr const char* height_path =  "ModelFiles/Med/Med_6-2_Height.jpg"; // Height - elevation
+constexpr const char* occlusion_path =  "ModelFiles/Warehouse/occlusion.png"; // Occlusion - shadows
 // 
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
 //constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
@@ -68,6 +68,7 @@ std::vector<float> colorsv;
 std::vector<float> texCoordsv;
 GLuint tex0;
 GLuint tex1;
+GLuint tex2;
 
 //globals
 float speed_y = 0.0f, speed_x = 0.0f, speed_z = 0.0f;
@@ -118,6 +119,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	tex0 = read_texture(tex_path);
 	//tex1 = read_texture(tex_path);
 	tex1 = read_texture(normal_path);
+	tex2 = read_texture(occlusion_path);
 
 	//suzanne = object(suzanne_data, { tex_path, normal_path }, sp);
 
@@ -155,6 +157,7 @@ void freeOpenGLProgram(GLFWwindow* window) {
     //************Tutaj umieszczaj kod, który należy wykonać po zakończeniu pętli głównej************
 	glDeleteTextures(1, &tex0);
 	glDeleteTextures(1, &tex1);
+	glDeleteTextures(1, &tex2);
 	delete sp;
 }
 
@@ -206,6 +209,10 @@ void drawScene(GLFWwindow* window, glm::mat4 Camera) {
 	glUniform1i(sp->u("textureMap1"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, tex1);
+
+	glUniform1i(sp->u("textureMap2"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, tex2);
 
 	glDrawArrays(GL_TRIANGLES, 0, mesh->mNumVertices); //Narysuj obiekt
 
