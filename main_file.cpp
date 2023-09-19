@@ -44,9 +44,9 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 //constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
 
 //constexpr const char* obj_path = "ModelFiles/Med/Med_6-2.obj";
-//constexpr const char* tex_path = "ModelFiles/Med/Med_6-2_BaseColor.jpg"; //Diffuse - color of the object
-//constexpr const char* normal_path = "ModelFiles/Med/Med_6-2_Normal.jpg"; // Normal - bumps
-//constexpr const char* height_path =  "ModelFiles/Med/Med_6-2_Height.jpg"; // Height - elevation
+//constexpr const char* tex_path = "ModelFiles/Med/Med_6-2_BaseColor.png"; //Diffuse - color of the object
+//constexpr const char* normal_path = "ModelFiles/Med/Med_6-2_Normal.png"; // Normal - bumps
+//constexpr const char* occlusion_path =  "ModelFiles/Med/Med_6-2_Roughness.png"; // Occlusion - shadows
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
 //constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
 
@@ -54,6 +54,9 @@ constexpr const char* obj_path = "ModelFiles/Warehouse/object.obj";
 constexpr const char* tex_path = "ModelFiles/Warehouse/texture.png"; //Diffuse - color of the object
 constexpr const char* normal_path = "ModelFiles/Warehouse/normal.png"; // Normal - bumps
 constexpr const char* occlusion_path =  "ModelFiles/Warehouse/occlusion.png"; // Occlusion - shadows
+
+constexpr const char* skybox_obj_path = "ModelFiles/skybox.obj";
+constexpr const char* skybox_tex_path = "ModelFiles/skybox.png"; //Diffuse - color of the object
 // 
 //constexpr const char* roughness_path = "ModelFiles/Med/Med_6-2_Roughness.jpg"; // Roughness - glossiness
 //constexpr const char* specular_path = "ModelFile/House_Roughness.png"; // Specular - highlights
